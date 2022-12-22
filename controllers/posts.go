@@ -71,7 +71,8 @@ func GetPost(c *gin.Context) {
 	var post Post
 	if err := row.Scan(&post.ID, &post.Title, &post.Content, &post.CreatedAt); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": true,
+			"error":   true,
+			"message": err.Error(),
 		})
 		return
 	}
