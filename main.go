@@ -11,7 +11,8 @@ func main() {
 
 	r := gin.Default()
 	r.POST("/create", controllers.CreatePost)
-	r.GET("/all", controllers.GetPosts)
+	r.GET("/posts", controllers.GetPosts)
+	r.GET("/posts/:id", controllers.GetPost)
 	// Running server on specific port
 	if err := r.Run(":5000"); err != nil {
 		panic(err.Error())

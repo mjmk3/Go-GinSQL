@@ -4,6 +4,7 @@ import (
 	"GoConn/db_client"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -60,4 +61,20 @@ func GetPosts(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, posts)
+}
+
+func GetPost(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.Atoi(idStr)
+
+	row := db_client.DBClient.QueryRow("SELECT id, title, content, created_at FROM posts WHERE id = ?;", id)
+	var post Post
+	if err := row.Scan(&post.ID, &post.Title, &post.Content, &post.CreatedAt); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": true,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
 }
