@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"GoConn/db_client"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -51,7 +52,9 @@ func GetPost(c *gin.Context) {
 	id, _ := strconv.Atoi(idStr)
 	var post Post
 
-	db_client.DBClient.Get(&post, "SELECT id, title, content, created_at FROM posts WHERE id = ?;", id) // single row (queryRow)
-
+	err := db_client.DBClient.Get(&post, "SELECT id, title, content, created_at FROM posts WHERE id = ?;", id) // single row (queryRow)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	c.JSON(http.StatusOK, post)
 }
