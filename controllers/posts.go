@@ -56,5 +56,8 @@ func GetPosts(c *gin.Context) {
 			})
 			return
 		}
+		posts = append(posts, singlePost)
 	}
+
+	c.JSON(http.StatusOK, posts)
 }
