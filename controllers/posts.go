@@ -8,6 +8,7 @@ import (
 )
 
 type Post struct {
+	//if you like to accept a null entry just put * before data type
 	ID        int64     `json: "id"`
 	Title     string    `json: "title"`
 	Content   string    `json: "content"`
@@ -34,4 +35,26 @@ func CreatePost(c *gin.Context) {
 		"error": false,
 		"id":    id,
 	})
+}
+
+func GetPosts(c *gin.Context) {
+	var posts []Post
+
+	rows, err := db_client.DBClient.Query("SELECT id, title, conent, created_at FROM posts;")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{
+			"error": true,
+		})
+		return
+	}
+
+	for rows.Next() {
+		var singlePost Post
+		if err := rows.Scan(&singlePost.ID, &singlePost.Title, &singlePost.Content, &singlePost.CreatedAt); err != nil {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error": true,
+			})
+			return
+		}
+	}
 }
