@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"GoConn/db_client"
+	"database/sql"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -70,7 +71,13 @@ func GetPost(c *gin.Context) {
 	row := db_client.DBClient.QueryRow("SELECT id, title, content, created_at FROM posts WHERE id = ?;", id)
 	var post Post
 	if err := row.Scan(&post.ID, &post.Title, &post.Content, &post.CreatedAt); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error":   true,
+				"message": err.Error(),
+			})
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   true,
 			"message": err.Error(),
 		})
