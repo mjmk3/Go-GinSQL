@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"GoConn/db_client"
-	"database/sql"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -42,24 +41,7 @@ func CreatePost(c *gin.Context) {
 func GetPosts(c *gin.Context) {
 	var posts []Post
 
-	rows, err := db_client.DBClient.Query("SELECT id, title, conent, created_at FROM posts;")
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": true,
-		})
-		return
-	}
-
-	for rows.Next() {
-		var singlePost Post
-		if err := rows.Scan(&singlePost.ID, &singlePost.Title, &singlePost.Content, &singlePost.CreatedAt); err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"error": true,
-			})
-			return
-		}
-		posts = append(posts, singlePost)
-	}
+	db_client.DBClient.Select(&posts, "SELECT id, title, conent, created_at FROM posts;") //rows (query)
 
 	c.JSON(http.StatusOK, posts)
 }
@@ -67,23 +49,9 @@ func GetPosts(c *gin.Context) {
 func GetPost(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.Atoi(idStr)
-
-	row := db_client.DBClient.QueryRow("SELECT id, title, content, created_at FROM posts WHERE id = ?;", id)
 	var post Post
-	if err := row.Scan(&post.ID, &post.Title, &post.Content, &post.CreatedAt); err != nil {
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error":   true,
-				"message": err.Error(),
-			})
-			return
-		}
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error":   true,
-			"message": err.Error(),
-		})
-		return
-	}
+
+	db_client.DBClient.Get(&post, "SELECT id, title, content, created_at FROM posts WHERE id = ?;", id) // single row (queryRow)
 
 	c.JSON(http.StatusOK, post)
 }
