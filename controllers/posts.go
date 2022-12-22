@@ -76,6 +76,7 @@ func GetPost(c *gin.Context) {
 				"error":   true,
 				"message": err.Error(),
 			})
+			return
 		}
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   true,
